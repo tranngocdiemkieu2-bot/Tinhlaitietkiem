@@ -75,11 +75,11 @@ if st.button("Tính toán"):
 
             st.metric(
                 "Tổng tiền nhận",
-                f"{tong_tien:,.2f} triệu đồng"
+                f"{tong_tien:,.3f} triệu đồng"
             )
 
             st.write(f"Số ngày gửi: **{so_ngay} ngày**")
-            st.write(f"Tiền lãi: **{tong_tien-so_tien:,.2f} triệu đồng**")
+            st.write(f"Tiền lãi: **{tong_tien-so_tien:,.3f} triệu đồng**")
 
         # ==========================
         # Rút sau ngày đáo hạn
