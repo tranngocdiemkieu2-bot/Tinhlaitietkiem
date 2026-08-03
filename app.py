@@ -107,8 +107,8 @@ if st.button("Tính toán"):
             st.write(f"Số ngày có kỳ hạn: **{ngay_co_ky_han} ngày**")
             st.write(f"Số ngày quá hạn: **{ngay_le} ngày**")
 
-            st.write(f"Tiền tại ngày đến hạn: **{tien_den_han:,.2f} triệu đồng**")
+            st.write(f"Tiền tại ngày đến hạn: **{tien_den_han:,.3f} triệu đồng**")
 
-            st.write(f"Tổng tiền khi rút: **{tong_tien:,.2f} triệu đồng**")
+            st.write(f"Tổng tiền khi rút: **{tong_tien:,.3f} triệu đồng**")
 
-            st.write(f"Tổng tiền lãi: **{tong_tien-so_tien:,.2f} triệu đồng**")
+            st.write(f"Tổng tiền lãi: **{tong_tien-so_tien:,.3f} triệu đồng**")
