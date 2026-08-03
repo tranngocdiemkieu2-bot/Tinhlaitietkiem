@@ -1,60 +1,87 @@
 import streamlit as st
-from datetime import timedelta
+from datetime import date
 
-# Tiêu đề
-st.title("💰 Tính tiền gửi tiết kiệm")
+st.set_page_config(page_title="Tính lãi tiền gửi", page_icon="💰")
 
+st.title("💰 TÍNH TIỀN GỬI TIẾT KIỆM")
+
+# ==========================
 # Nhập dữ liệu
-C = st.number_input(
+# ==========================
+
+so_tien = st.number_input(
     "Nhập số tiền gửi (triệu đồng)",
     min_value=0.0,
     value=500.0,
     step=10.0
 )
 
-i = st.number_input(
+lai_suat = st.number_input(
     "Nhập lãi suất (%/năm)",
     min_value=0.0,
     value=5.0,
     step=0.1
-) / 100
-
-ngay_gui = st.date_input("Chọn ngày gửi")
-
-# Nhập thời gian theo tháng
-thang = st.number_input(
-    "Nhập thời gian gửi (tháng)",
-    min_value=1,
-    value=3,
-    step=1
 )
+
+ngay_gui = st.date_input(
+    "Ngày gửi",
+    value=date.today()
+)
+
+ngay_dao_han = st.date_input(
+    "Ngày đến hạn",
+    value=date.today()
+)
+
+# ==========================
+# Tính toán
+# ==========================
 
 if st.button("Tính toán"):
 
-    # Quy đổi tháng sang ngày
-    n = thang * (365 / 12)
+    # Kiểm tra ngày hợp lệ
+    if ngay_dao_han <= ngay_gui:
+        st.error("Ngày đến hạn phải lớn hơn ngày gửi.")
+    else:
 
-    # Lãi đơn
-    An = C * (1 + (i / 365) * n)
+        # Số ngày gửi thực tế
+        so_ngay = (ngay_dao_han - ngay_gui).days
 
-    # Lãi kép
-    Bn = C * ((1 + (i / 365)) ** n)
+        i = lai_suat / 100
 
-    # Ngày đáo hạn
-    ngay_dao_han = ngay_gui + timedelta(days=int(n))
+        # Lãi đơn
+        tien_lai_don = so_tien * (1 + (i / 365) * so_ngay)
 
-    st.subheader("📊 Kết quả")
+        # Lãi kép
+        tien_lai_kep = so_tien * ((1 + i / 365) ** so_ngay)
 
-    st.write(f"**Ngày gửi:** {ngay_gui.strftime('%d/%m/%Y')}")
-    st.write(f"**Thời gian gửi:** {thang} tháng")
-    st.write(f"**Ngày đáo hạn:** {ngay_dao_han.strftime('%d/%m/%Y')}")
+        st.success("Kết quả tính toán")
 
-    st.success(f"Tổng số tiền theo lãi đơn: {An:.2f} triệu đồng")
-    st.success(f"Tổng số tiền theo lãi kép: {Bn:.2f} triệu đồng")
+        col1, col2 = st.columns(2)
 
-    st.info(f"Tiền lãi (lãi đơn): {An - C:.2f} triệu đồng")
-    st.info(f"Tiền lãi (lãi kép): {Bn - C:.2f} triệu đồng")
-    st.success(f"Tổng số tiền theo **lãi kép**: {Bn:.2f} triệu đồng")
+        with col1:
+            st.metric(
+                "Tổng tiền theo lãi đơn",
+                f"{tien_lai_don:,.2f} triệu đồng"
+            )
 
-    st.info(f"Tiền lãi (lãi đơn): {An - C:.2f} triệu đồng")
-    st.info(f"Tiền lãi (lãi kép): {Bn - C:.2f} triệu đồng")
+        with col2:
+            st.metric(
+                "Tổng tiền theo lãi kép",
+                f"{tien_lai_kep:,.2f} triệu đồng"
+            )
+
+        st.write("---")
+
+        st.write(f"**Ngày gửi:** {ngay_gui.strftime('%d/%m/%Y')}")
+        st.write(f"**Ngày đến hạn:** {ngay_dao_han.strftime('%d/%m/%Y')}")
+        st.write(f"**Số ngày gửi thực tế:** {so_ngay} ngày")
+
+        st.write("---")
+
+        st.subheader("Chi tiết")
+
+        st.write(f"**Số tiền gốc:** {so_tien:,.2f} triệu đồng")
+        st.write(f"**Lãi suất:** {lai_suat:.2f}%/năm")
+        st.write(f"**Tiền lãi (lãi đơn):** {tien_lai_don - so_tien:,.2f} triệu đồng")
+        st.write(f"**Tiền lãi (lãi kép):** {tien_lai_kep - so_tien:,.2f} triệu đồng")
