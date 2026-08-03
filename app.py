@@ -99,7 +99,7 @@ if st.button("Tính toán"):
 
             st.metric(
                 "Tổng tiền nhận",
-                f"{tong_tien:,.2f} triệu đồng"
+                f"{tong_tien:,.3f} triệu đồng"
             )
 
             st.write("### Chi tiết")
