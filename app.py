@@ -16,10 +16,17 @@ so_tien = st.number_input(
     step=10.0
 )
 
-lai_suat = st.number_input(
-    "Nhập lãi suất (%/năm)",
+lai_suat_co_ky_han = st.number_input(
+    "Lãi suất có kỳ hạn (%/năm)",
     min_value=0.0,
     value=5.0,
+    step=0.1
+)
+
+lai_suat_khong_ky_han = st.number_input(
+    "Lãi suất không kỳ hạn (%/năm)",
+    min_value=0.0,
+    value=0.2,
     step=0.1
 )
 
@@ -28,8 +35,13 @@ ngay_gui = st.date_input(
     value=date.today()
 )
 
-ngay_dao_han = st.date_input(
+ngay_den_han = st.date_input(
     "Ngày đến hạn",
+    value=date.today()
+)
+
+ngay_rut = st.date_input(
+    "Ngày rút tiền",
     value=date.today()
 )
 
@@ -39,49 +51,64 @@ ngay_dao_han = st.date_input(
 
 if st.button("Tính toán"):
 
-    # Kiểm tra ngày hợp lệ
-    if ngay_dao_han <= ngay_gui:
-        st.error("Ngày đến hạn phải lớn hơn ngày gửi.")
+    if ngay_den_han <= ngay_gui:
+        st.error("Ngày đến hạn phải sau ngày gửi.")
+
+    elif ngay_rut < ngay_gui:
+        st.error("Ngày rút tiền không được trước ngày gửi.")
+
     else:
 
-        # Số ngày gửi thực tế
-        so_ngay = (ngay_dao_han - ngay_gui).days
+        i_ckh = lai_suat_co_ky_han / 100
+        i_kkh = lai_suat_khong_ky_han / 100
 
-        i = lai_suat / 100
+        # ==========================
+        # Rút trước hoặc đúng ngày đáo hạn
+        # ==========================
+        if ngay_rut <= ngay_den_han:
 
-        # Lãi đơn
-        tien_lai_don = so_tien * (1 + (i / 365) * so_ngay)
+            so_ngay = (ngay_rut - ngay_gui).days
 
-        # Lãi kép
-        tien_lai_kep = so_tien * ((1 + i / 365) ** so_ngay)
+            tong_tien = so_tien * (1 + (i_kkh / 365) * so_ngay)
 
-        st.success("Kết quả tính toán")
+            st.warning("Khách hàng rút trước (hoặc đúng) ngày đến hạn → áp dụng lãi suất KHÔNG KỲ HẠN.")
 
-        col1, col2 = st.columns(2)
-
-        with col1:
             st.metric(
-                "Tổng tiền theo lãi đơn",
-                f"{tien_lai_don:,.2f} triệu đồng"
+                "Tổng tiền nhận",
+                f"{tong_tien:,.2f} triệu đồng"
             )
 
-        with col2:
+            st.write(f"Số ngày gửi: **{so_ngay} ngày**")
+            st.write(f"Tiền lãi: **{tong_tien-so_tien:,.2f} triệu đồng**")
+
+        # ==========================
+        # Rút sau ngày đáo hạn
+        # ==========================
+        else:
+
+            ngay_co_ky_han = (ngay_den_han - ngay_gui).days
+            ngay_le = (ngay_rut - ngay_den_han).days
+
+            # Tiền đến ngày đáo hạn
+            tien_den_han = so_tien * (1 + (i_ckh / 365) * ngay_co_ky_han)
+
+            # Phần ngày lẻ tính lãi không kỳ hạn
+            tong_tien = tien_den_han * (1 + (i_kkh / 365) * ngay_le)
+
+            st.success("Khách hàng rút sau ngày đến hạn.")
+
             st.metric(
-                "Tổng tiền theo lãi kép",
-                f"{tien_lai_kep:,.2f} triệu đồng"
+                "Tổng tiền nhận",
+                f"{tong_tien:,.2f} triệu đồng"
             )
 
-        st.write("---")
+            st.write("### Chi tiết")
 
-        st.write(f"**Ngày gửi:** {ngay_gui.strftime('%d/%m/%Y')}")
-        st.write(f"**Ngày đến hạn:** {ngay_dao_han.strftime('%d/%m/%Y')}")
-        st.write(f"**Số ngày gửi thực tế:** {so_ngay} ngày")
+            st.write(f"Số ngày có kỳ hạn: **{ngay_co_ky_han} ngày**")
+            st.write(f"Số ngày quá hạn: **{ngay_le} ngày**")
 
-        st.write("---")
+            st.write(f"Tiền tại ngày đến hạn: **{tien_den_han:,.2f} triệu đồng**")
 
-        st.subheader("Chi tiết")
+            st.write(f"Tổng tiền khi rút: **{tong_tien:,.2f} triệu đồng**")
 
-        st.write(f"**Số tiền gốc:** {so_tien:,.2f} triệu đồng")
-        st.write(f"**Lãi suất:** {lai_suat:.2f}%/năm")
-        st.write(f"**Tiền lãi (lãi đơn):** {tien_lai_don - so_tien:,.2f} triệu đồng")
-        st.write(f"**Tiền lãi (lãi kép):** {tien_lai_kep - so_tien:,.2f} triệu đồng")
+            st.write(f"Tổng tiền lãi: **{tong_tien-so_tien:,.2f} triệu đồng**")
