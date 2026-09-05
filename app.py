@@ -226,9 +226,9 @@ if "da_tinh" not in st.session_state:
     st.session_state.da_tinh = False
 
 
-def set_money(value):
-    st.session_state.so_tien = value
-
+def reset_data():
+    st.session_state.so_tien = 50_000_000.0
+    st.session_state.da_tinh = False
 
 # =========================================================
 # 5. BẢNG ĐIỀU KHIỂN
@@ -417,11 +417,7 @@ with st.sidebar:
     if tinh:
         st.session_state.da_tinh = True
 
-    if st.button("🔄 Đặt lại"):
-        st.session_state.so_tien = 50_000_000.0
-        st.session_state.da_tinh = False
-        st.rerun()
-
+   st.button("🔄 Đặt lại", on_click=reset_data)
 
 # =========================================================
 # 6. HEADER
