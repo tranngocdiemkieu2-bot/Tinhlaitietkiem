@@ -1,114 +1,69 @@
 import streamlit as st
-from datetime import date
 
-st.set_page_config(page_title="Tính lãi tiền gửi", page_icon="💰")
-
-st.title("💰 TÍNH TIỀN GỬI TIẾT KIỆM")
-
-# ==========================
-# Nhập dữ liệu
-# ==========================
-
-so_tien = st.number_input(
-    "Nhập số tiền gửi (triệu đồng)",
-    min_value=0.0,
-    value=500.0,
-    step=10.0
+st.set_page_config(
+    page_title="Tính lãi tiền gửi tiết kiệm",
+    page_icon="🏦",
+    layout="centered"
 )
 
-lai_suat_co_ky_han = st.number_input(
-    "Lãi suất có kỳ hạn (%/năm)",
+st.title("🏦 TÍNH LÃI TIỀN GỬI TIẾT KIỆM")
+st.write("Nhập thông tin tiền gửi để tính tiền lãi và tổng số tiền nhận được.")
+
+st.divider()
+
+# Nhập thông tin
+so_tien = st.number_input(
+    "💰 Số tiền gửi (VNĐ)",
+    min_value=0.0,
+    value=10000000.0,
+    step=500000.0
+)
+
+lai_suat = st.number_input(
+    "📈 Lãi suất (%/năm)",
     min_value=0.0,
     value=5.0,
     step=0.1
 )
 
-lai_suat_khong_ky_han = st.number_input(
-    "Lãi suất không kỳ hạn (%/năm)",
-    min_value=0.0,
-    value=0.2,
-    step=0.1
+ky_han = st.number_input(
+    "📅 Kỳ hạn (tháng)",
+    min_value=1,
+    value=12,
+    step=1
 )
 
-ngay_gui = st.date_input(
-    "Ngày gửi",
-    value=date.today()
-)
+st.divider()
 
-ngay_den_han = st.date_input(
-    "Ngày đến hạn",
-    value=date.today()
-)
+if st.button("🧮 TÍNH LÃI", use_container_width=True):
 
-ngay_rut = st.date_input(
-    "Ngày rút tiền",
-    value=date.today()
-)
+    tien_lai = so_tien * lai_suat / 100 * ky_han / 12
+    tong_tien = so_tien + tien_lai
 
-# ==========================
-# Tính toán
-# ==========================
+    st.success("Đã tính toán thành công!")
 
-if st.button("Tính toán"):
+    col1, col2 = st.columns(2)
 
-    if ngay_den_han <= ngay_gui:
-        st.error("Ngày đến hạn phải sau ngày gửi.")
+    with col1:
+        st.metric(
+            "💵 Tiền lãi",
+            f"{tien_lai:,.0f} VNĐ"
+        )
 
-    elif ngay_rut < ngay_gui:
-        st.error("Ngày rút tiền không được trước ngày gửi.")
+    with col2:
+        st.metric(
+            "💰 Tổng tiền nhận",
+            f"{tong_tien:,.0f} VNĐ"
+        )
 
-    else:
+    st.info(
+        f"""
+        **Thông tin khoản gửi:**
 
-        i_ckh = lai_suat_co_ky_han / 100
-        i_kkh = lai_suat_khong_ky_han / 100
-
-        # ==========================
-        # Rút trước hoặc đúng ngày đáo hạn
-        # ==========================
-        if ngay_rut <= ngay_den_han:
-
-            so_ngay = (ngay_rut - ngay_gui).days
-
-            tong_tien = so_tien * (1 + (i_kkh / 365) * so_ngay)
-
-            st.warning("Khách hàng rút trước (hoặc đúng) ngày đến hạn → áp dụng lãi suất KHÔNG KỲ HẠN.")
-
-            st.metric(
-                "Tổng tiền nhận",
-                f"{tong_tien:,.3f} triệu đồng"
-            )
-
-            st.write(f"Số ngày gửi: **{so_ngay} ngày**")
-            st.write(f"Tiền lãi: **{tong_tien-so_tien:,.3f} triệu đồng**")
-
-        # ==========================
-        # Rút sau ngày đáo hạn
-        # ==========================
-        else:
-
-            ngay_co_ky_han = (ngay_den_han - ngay_gui).days
-            ngay_le = (ngay_rut - ngay_den_han).days
-
-            # Tiền đến ngày đáo hạn
-            tien_den_han = so_tien * (1 + (i_ckh / 365) * ngay_co_ky_han)
-
-            # Phần ngày lẻ tính lãi không kỳ hạn
-            tong_tien = tien_den_han * (1 + (i_kkh / 365) * ngay_le)
-
-            st.success("Khách hàng rút sau ngày đến hạn.")
-
-            st.metric(
-                "Tổng tiền nhận",
-                f"{tong_tien:,.3f} triệu đồng"
-            )
-
-            st.write("### Chi tiết")
-
-            st.write(f"Số ngày có kỳ hạn: **{ngay_co_ky_han} ngày**")
-            st.write(f"Số ngày quá hạn: **{ngay_le} ngày**")
-
-            st.write(f"Tiền tại ngày đến hạn: **{tien_den_han:,.3f} triệu đồng**")
-
-            st.write(f"Tổng tiền khi rút: **{tong_tien:,.3f} triệu đồng**")
-
-            st.write(f"Tổng tiền lãi: **{tong_tien-so_tien:,.3f} triệu đồng**")
+        - Số tiền gửi: **{so_tien:,.0f} VNĐ**
+        - Lãi suất: **{lai_suat}%/năm**
+        - Kỳ hạn: **{ky_han} tháng**
+        - Tiền lãi: **{tien_lai:,.0f} VNĐ**
+        - Tổng tiền nhận: **{tong_tien:,.0f} VNĐ**
+        """
+    )
