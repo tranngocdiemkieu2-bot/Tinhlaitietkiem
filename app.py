@@ -417,7 +417,7 @@ with st.sidebar:
     if tinh:
         st.session_state.da_tinh = True
 
-   st.button("🔄 Đặt lại", on_click=reset_data)
+    st.button("🔄 Đặt lại", on_click=reset_data)
 
 # =========================================================
 # 6. HEADER
