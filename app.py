@@ -1,166 +1,313 @@
 import streamlit as st
-from datetime import date
 import pandas as pd
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # =========================================================
-# CẤU HÌNH TRANG
+# 1. CẤU HÌNH
 # =========================================================
 
 st.set_page_config(
-    page_title="Tính lãi tiền gửi tiết kiệm",
+    page_title="SmartSave 360",
     page_icon="🏦",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# CSS GIAO DIỆN
+# 2. CSS - LÀM BẢNG ĐIỀU KHIỂN TO HƠN
 # =========================================================
 
 st.markdown("""
 <style>
 
-.main {
-    background-color: #f5f7fb;
+/* ==============================
+   SIDEBAR
+   ============================== */
+
+section[data-testid="stSidebar"] {
+    width: 390px !important;
 }
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+section[data-testid="stSidebar"] > div {
+    width: 390px !important;
 }
 
-.header-box {
-    padding: 30px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #111a4a, #143d75);
+section[data-testid="stSidebar"] .block-container {
+    padding: 2rem 1.4rem 3rem 1.4rem;
+}
+
+/* Tiêu đề sidebar */
+
+.sidebar-title {
+    background: linear-gradient(135deg, #101b4d, #164d87);
     color: white;
-    margin-bottom: 25px;
-}
-
-.header-title {
-    font-size: 32px;
-    font-weight: 700;
-}
-
-.header-sub {
-    font-size: 16px;
-    opacity: 0.9;
-}
-
-.card {
-    background: white;
-    padding: 22px;
+    padding: 20px;
     border-radius: 18px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sidebar-title h2 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.sidebar-title p {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+}
+
+/* ==============================
+   HEADER
+   ============================== */
+
+.hero {
+    background: linear-gradient(
+        135deg,
+        #101846,
+        #123c70,
+        #155a83
+    );
+    padding: 35px 40px;
+    border-radius: 24px;
+    color: white;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 25px rgba(15, 30, 70, 0.18);
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+.hero p {
+    font-size: 17px;
     margin-bottom: 20px;
 }
 
-.result-card {
-    background: linear-gradient(135deg, #eef7ff, #ffffff);
+.hero-info {
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+/* ==============================
+   CARD
+   ============================== */
+
+.card {
+    background: white;
     padding: 25px;
+    border-radius: 20px;
+    border: 1px solid #e5eaf2;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+/* ==============================
+   METRIC
+   ============================== */
+
+.metric-card {
+    background: white;
+    padding: 22px;
     border-radius: 18px;
-    border: 1px solid #dbeafe;
+    border: 1px solid #e3e9f2;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    text-align: center;
 }
 
-.big-number {
-    font-size: 30px;
-    font-weight: 700;
-    color: #123c73;
-}
-
-.small-label {
+.metric-title {
     color: #64748b;
     font-size: 14px;
 }
 
+.metric-value {
+    color: #123d73;
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+/* ==============================
+   RESULT
+   ============================== */
+
+.result-box {
+    background: linear-gradient(
+        135deg,
+        #eef7ff,
+        #ffffff
+    );
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid #dbeafe;
+}
+
+/* ==============================
+   BUTTON
+   ============================== */
+
 .stButton > button {
     width: 100%;
+    min-height: 48px;
     border-radius: 12px;
-    height: 50px;
-    font-size: 17px;
-    font-weight: 700;
+    font-weight: 600;
+}
+
+/* Nút tính toán */
+
+div[data-testid="stButton"] button[kind="primary"] {
+    min-height: 58px;
+    font-size: 18px;
+}
+
+/* ==============================
+   TAB
+   ============================== */
+
+button[data-baseweb="tab"] {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ==============================
+   MOBILE
+   ============================== */
+
+@media (max-width: 900px) {
+
+    section[data-testid="stSidebar"] {
+        width: 330px !important;
+    }
+
+    section[data-testid="stSidebar"] > div {
+        width: 330px !important;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =========================================================
-# TIÊU ĐỀ
-# =========================================================
-
-st.markdown("""
-<div class="header-box">
-    <div class="header-title">🏦 Trung tâm tính tiền gửi tiết kiệm</div>
-    <div class="header-sub">
-        Mô phỏng gửi - lãi - đáo hạn - rút trước hạn - tự động tái tục
-    </div>
-    <br>
-    🔴 Rút trước hạn → lãi suất không kỳ hạn
-    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-    🟢 Đến hạn không rút → tự động tái tục
-    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-    🟡 Cơ sở tính lãi: 365 ngày/năm
-</div>
-""", unsafe_allow_html=True)
 
 # =========================================================
-# HÀM TÍNH TOÁN
+# 3. HÀM
 # =========================================================
 
-def tinh_lai(so_tien, lai_suat, so_ngay):
-    return so_tien * (lai_suat / 100) * so_ngay / 365
+def format_money(value):
+    return f"{value:,.0f} VNĐ"
 
 
-def dinh_dang_tien(x):
-    return f"{x:,.0f} VNĐ"
+def tinh_lai_don(
+    tien_goc,
+    lai_suat,
+    so_ngay
+):
+    return tien_goc * (lai_suat / 100) * so_ngay / 365
 
 
 # =========================================================
-# SIDEBAR - BẢNG ĐIỀU KHIỂN
+# 4. SESSION STATE
+# =========================================================
+
+if "so_tien" not in st.session_state:
+    st.session_state.so_tien = 50_000_000.0
+
+if "da_tinh" not in st.session_state:
+    st.session_state.da_tinh = False
+
+
+def set_money(value):
+    st.session_state.so_tien = value
+
+
+# =========================================================
+# 5. BẢNG ĐIỀU KHIỂN
 # =========================================================
 
 with st.sidebar:
 
-    st.markdown("## 🎛️ BẢNG ĐIỀU KHIỂN")
+    st.markdown("""
+    <div class="sidebar-title">
+        <h2>🎛️ BẢNG ĐIỀU KHIỂN</h2>
+        <p>Thiết lập khoản tiền gửi</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ---------------------------------------------
+    # TIỀN GỬI
+    # ---------------------------------------------
 
     st.markdown("### 💰 Số tiền gửi")
 
-    so_tien = st.number_input(
+    st.number_input(
         "Số tiền gửi (VNĐ)",
         min_value=0.0,
-        value=50_000_000.0,
         step=1_000_000.0,
-        format="%.0f"
+        format="%.0f",
+        key="so_tien"
     )
 
-    st.caption(
-        f"Đang chọn: **{dinh_dang_tien(so_tien)}**"
+    st.info(
+        f"💵 Đang chọn: **{format_money(st.session_state.so_tien)}**"
     )
 
-    st.markdown("#### Chọn nhanh")
+    st.markdown("#### ⚡ Chọn nhanh")
 
-    col1, col2 = st.columns(2)
+    c1, c2 = st.columns(2)
 
-    with col1:
-        if st.button("50 triệu"):
-            so_tien = 50_000_000
+    with c1:
+        st.button(
+            "💰 50 triệu",
+            on_click=set_money,
+            args=(50_000_000,)
+        )
 
-        if st.button("200 triệu"):
-            so_tien = 200_000_000
+        st.button(
+            "💰 200 triệu",
+            on_click=set_money,
+            args=(200_000_000,)
+        )
 
-        if st.button("500 triệu"):
-            so_tien = 500_000_000
+        st.button(
+            "💰 500 triệu",
+            on_click=set_money,
+            args=(500_000_000,)
+        )
 
-    with col2:
-        if st.button("100 triệu"):
-            so_tien = 100_000_000
+    with c2:
+        st.button(
+            "💰 100 triệu",
+            on_click=set_money,
+            args=(100_000_000,)
+        )
 
-        if st.button("1 tỷ"):
-            so_tien = 1_000_000_000
+        st.button(
+            "💰 1 tỷ",
+            on_click=set_money,
+            args=(1_000_000_000,)
+        )
 
-        if st.button("2 tỷ"):
-            so_tien = 2_000_000_000
+        st.button(
+            "💰 2 tỷ",
+            on_click=set_money,
+            args=(2_000_000_000,)
+        )
 
     st.markdown("---")
+
+    # ---------------------------------------------
+    # KỲ HẠN
+    # ---------------------------------------------
 
     st.markdown("### 📅 Kỳ hạn & lãi suất")
 
@@ -180,6 +327,18 @@ with st.sidebar:
         index=2
     )
 
+    so_thang = {
+        "Không kỳ hạn": 0,
+        "1 tháng": 1,
+        "3 tháng": 3,
+        "6 tháng": 6,
+        "9 tháng": 9,
+        "12 tháng": 12,
+        "18 tháng": 18,
+        "24 tháng": 24,
+        "36 tháng": 36
+    }[ky_han]
+
     lai_suat = st.number_input(
         "📈 Lãi suất có kỳ hạn (%/năm)",
         min_value=0.0,
@@ -187,7 +346,7 @@ with st.sidebar:
         step=0.1
     )
 
-    lai_suat_khong_ky_han = st.number_input(
+    lai_khong_ky_han = st.number_input(
         "📉 Lãi suất không kỳ hạn (%/năm)",
         min_value=0.0,
         value=0.2,
@@ -201,47 +360,34 @@ with st.sidebar:
         step=0.1
     )
 
-    st.markdown("---")
+    # ---------------------------------------------
+    # THỜI GIAN
+    # ---------------------------------------------
 
-    st.markdown("### ⏰ Thời gian")
+    st.markdown("---")
+    st.markdown("### 🗓️ Thời gian")
 
     ngay_gui = st.date_input(
         "Ngày gửi tiền",
         value=date.today()
     )
 
-    # Xác định số tháng
-    mapping_thang = {
-        "Không kỳ hạn": 0,
-        "1 tháng": 1,
-        "3 tháng": 3,
-        "6 tháng": 6,
-        "9 tháng": 9,
-        "12 tháng": 12,
-        "18 tháng": 18,
-        "24 tháng": 24,
-        "36 tháng": 36
-    }
-
-    thang = mapping_thang[ky_han]
-
-    # Tính ngày đáo hạn
-    if thang > 0:
-        try:
-            from dateutil.relativedelta import relativedelta
-            ngay_dao_han = ngay_gui + relativedelta(months=thang)
-        except:
-            ngay_dao_han = ngay_gui
-    else:
-        ngay_dao_han = ngay_gui
+    ngay_dao_han = (
+        ngay_gui + relativedelta(months=so_thang)
+        if so_thang > 0
+        else ngay_gui
+    )
 
     ngay_rut = st.date_input(
         "Ngày rút tiền",
         value=ngay_dao_han
     )
 
-    st.markdown("---")
+    # ---------------------------------------------
+    # PHƯƠNG THỨC
+    # ---------------------------------------------
 
+    st.markdown("---")
     st.markdown("### 💵 Phương thức nhận lãi")
 
     phuong_thuc = st.radio(
@@ -253,139 +399,277 @@ with st.sidebar:
         ]
     )
 
-    st.markdown("---")
-
     tai_tuc = st.checkbox(
-        "🔄 Tự động tái tục khi đến hạn",
-        value=False
+        "🔄 Tự động tái tục khi đáo hạn"
     )
 
+    # ---------------------------------------------
+    # TÍNH TOÁN
+    # ---------------------------------------------
+
     st.markdown("---")
 
-    tinh_toan = st.button(
+    tinh = st.button(
         "🔥 TÍNH TOÁN NGAY",
         type="primary"
     )
 
-    reset = st.button(
-        "🔄 Đặt lại số tiền mặc định"
-    )
+    if tinh:
+        st.session_state.da_tinh = True
+
+    if st.button("🔄 Đặt lại"):
+        st.session_state.so_tien = 50_000_000.0
+        st.session_state.da_tinh = False
+        st.rerun()
 
 
 # =========================================================
-# XỬ LÝ TÍNH TOÁN
+# 6. HEADER
 # =========================================================
 
-if reset:
-    st.rerun()
+st.markdown("""
+<div class="hero">
+
+<h1>🏦 SMARTSAVE 360</h1>
+
+<p>
+<b>Hệ thống mô phỏng nghiệp vụ tiền gửi tiết kiệm</b>
+</p>
+
+<div class="hero-info">
+
+🔴 Rút trước hạn → áp dụng lãi suất không kỳ hạn
+&nbsp;&nbsp; | &nbsp;&nbsp;
+
+🟢 Đến hạn → nhận lãi hoặc tái tục
+&nbsp;&nbsp; | &nbsp;&nbsp;
+
+📅 Cơ sở tính lãi: 365 ngày/năm
+
+</div>
+
+</div>
+""", unsafe_allow_html=True)
 
 
-if tinh_toan:
+# =========================================================
+# 7. TÍNH TOÁN
+# =========================================================
 
-    # Số ngày thực tế
-    so_ngay = (ngay_rut - ngay_gui).days
+so_tien = st.session_state.so_tien
 
-    if so_ngay < 0:
-        st.error("❌ Ngày rút không được trước ngày gửi.")
-        st.stop()
+so_ngay = (ngay_rut - ngay_gui).days
 
-    # Kiểm tra rút trước hạn
-    rut_truoc_han = False
+rut_truoc_han = (
+    so_thang > 0
+    and ngay_rut < ngay_dao_han
+)
 
-    if thang > 0 and ngay_rut < ngay_dao_han:
-        rut_truoc_han = True
+if rut_truoc_han:
+    lai_ap_dung = lai_khong_ky_han
+    trang_thai = "🔴 Rút trước hạn"
+else:
+    lai_ap_dung = lai_suat
+    trang_thai = "🟢 Đúng hạn"
 
-    # Xác định lãi suất
-    if rut_truoc_han:
-        lai_ap_dung = lai_suat_khong_ky_han
-        trang_thai = "🔴 Rút trước hạn"
+
+if so_ngay < 0:
+    st.error("❌ Ngày rút không được trước ngày gửi.")
+    st.stop()
+
+
+tien_lai = tinh_lai_don(
+    so_tien,
+    lai_ap_dung,
+    so_ngay
+)
+
+
+# =========================================================
+# 8. TÍNH TỔNG TIỀN
+# =========================================================
+
+if phuong_thuc == "💵 Nhận lãi trước":
+
+    tong_nhan = so_tien
+
+elif phuong_thuc == "📅 Nhận lãi hàng tháng":
+
+    tong_nhan = so_tien + tien_lai
+
+else:
+
+    tong_nhan = so_tien + tien_lai
+
+
+# =========================================================
+# 9. TAB
+# =========================================================
+
+tab1, tab2, tab3, tab4 = st.tabs(
+    [
+        "📊 Tổng quan",
+        "💰 Tính tiền gửi",
+        "📋 Dòng tiền",
+        "📈 So sánh thông minh"
+    ]
+)
+
+
+# =========================================================
+# TAB 1
+# =========================================================
+
+with tab1:
+
+    st.markdown("## 📊 Tổng quan")
+
+    if not st.session_state.da_tinh:
+
+        st.info(
+            "💡 Nhập thông tin tại **Bảng điều khiển bên trái** "
+            "sau đó bấm **🔥 TÍNH TOÁN NGAY**."
+        )
+
+        c1, c2, c3 = st.columns(3)
+
+        with c1:
+            st.markdown("""
+            <div class="card">
+            <h3>💰 Tiền gửi</h3>
+            <p>
+            Thiết lập số tiền và kỳ hạn gửi
+            phù hợp với nhu cầu.
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c2:
+            st.markdown("""
+            <div class="card">
+            <h3>📈 Lợi nhuận</h3>
+            <p>
+            Tự động tính tiền lãi dự kiến
+            theo số ngày thực tế.
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c3:
+            st.markdown("""
+            <div class="card">
+            <h3>🧠 Phân tích</h3>
+            <p>
+            So sánh kỳ hạn và đánh giá
+            hiệu quả khoản tiền gửi.
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
+
     else:
-        lai_ap_dung = lai_suat
-        trang_thai = "🟢 Đúng hạn"
 
-    # Tính lãi
-    tien_lai = tinh_lai(
-        so_tien,
-        lai_ap_dung,
-        so_ngay
-    )
-
-    # Nhận lãi trước
-    if phuong_thuc == "💵 Nhận lãi trước":
-
-        tien_lai = tinh_lai(
-            so_tien,
-            lai_ap_dung,
-            so_ngay
+        st.success(
+            f"✅ Đã tính toán khoản tiền gửi {format_money(so_tien)}"
         )
 
-        tong_nhan = so_tien
+        c1, c2, c3, c4 = st.columns(4)
 
-    # Nhận lãi cuối kỳ
-    elif phuong_thuc == "📆 Nhận lãi cuối kỳ":
+        with c1:
+            st.markdown("""
+            <div class="metric-card">
+            <div class="metric-title">💰 TIỀN GỐC</div>
+            """, unsafe_allow_html=True)
 
-        tong_nhan = so_tien + tien_lai
+            st.markdown(
+                f'<div class="metric-value">{format_money(so_tien)}</div>',
+                unsafe_allow_html=True
+            )
 
-    # Nhận lãi hàng tháng
-    else:
+            st.markdown("</div>", unsafe_allow_html=True)
 
-        tong_nhan = so_tien + tien_lai
+        with c2:
+            st.markdown("""
+            <div class="metric-card">
+            <div class="metric-title">📈 TIỀN LÃI</div>
+            """, unsafe_allow_html=True)
 
-    # =====================================================
-    # KẾT QUẢ
-    # =====================================================
+            st.markdown(
+                f'<div class="metric-value">{format_money(tien_lai)}</div>',
+                unsafe_allow_html=True
+            )
 
-    st.success("✅ Đã tính toán thành công!")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("## 📊 KẾT QUẢ TÍNH TOÁN")
+        with c3:
+            st.markdown("""
+            <div class="metric-card">
+            <div class="metric-title">💎 TỔNG NHẬN</div>
+            """, unsafe_allow_html=True)
 
-    col1, col2, col3, col4 = st.columns(4)
+            st.markdown(
+                f'<div class="metric-value">{format_money(tong_nhan)}</div>',
+                unsafe_allow_html=True
+            )
 
-    with col1:
-        st.metric(
-            "💰 Tiền gửi",
-            dinh_dang_tien(so_tien)
-        )
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    with col2:
-        st.metric(
-            "📈 Tiền lãi",
-            dinh_dang_tien(tien_lai)
-        )
+        with c4:
+            st.markdown("""
+            <div class="metric-card">
+            <div class="metric-title">📅 SỐ NGÀY</div>
+            """, unsafe_allow_html=True)
 
-    with col3:
-        st.metric(
-            "💵 Tổng tiền nhận",
-            dinh_dang_tien(tong_nhan)
-        )
+            st.markdown(
+                f'<div class="metric-value">{so_ngay} ngày</div>',
+                unsafe_allow_html=True
+            )
 
-    with col4:
-        st.metric(
-            "📅 Số ngày gửi",
-            f"{so_ngay} ngày"
-        )
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+        st.markdown("### 📌 Tình trạng khoản gửi")
 
-    # =====================================================
-    # THÔNG TIN CHI TIẾT
-    # =====================================================
+        if rut_truoc_han:
+            st.warning(
+                "🔴 Khoản tiền đang **rút trước hạn**. "
+                f"Lãi suất áp dụng: **{lai_khong_ky_han:.2f}%/năm**."
+            )
+        else:
+            st.success(
+                f"🟢 Khoản tiền gửi **đúng hạn**. "
+                f"Lãi suất áp dụng: **{lai_suat:.2f}%/năm**."
+            )
+
+
+# =========================================================
+# TAB 2
+# =========================================================
+
+with tab2:
+
+    st.markdown("## 💰 Chi tiết khoản tiền gửi")
 
     col1, col2 = st.columns(2)
 
     with col1:
 
         st.markdown("""
-        <div class="result-card">
+        <div class="result-box">
         <h3>🏦 Thông tin khoản gửi</h3>
         """, unsafe_allow_html=True)
 
-        st.write(f"**Số tiền gửi:** {dinh_dang_tien(so_tien)}")
+        st.write(f"**Số tiền gửi:** {format_money(so_tien)}")
         st.write(f"**Kỳ hạn:** {ky_han}")
-        st.write(f"**Lãi suất:** {lai_ap_dung:.2f}%/năm")
-        st.write(f"**Ngày gửi:** {ngay_gui.strftime('%d/%m/%Y')}")
-        st.write(f"**Ngày đáo hạn:** {ngay_dao_han.strftime('%d/%m/%Y')}")
-        st.write(f"**Ngày rút:** {ngay_rut.strftime('%d/%m/%Y')}")
+        st.write(f"**Lãi suất niêm yết:** {lai_suat:.2f}%/năm")
+        st.write(f"**Lãi suất áp dụng:** {lai_ap_dung:.2f}%/năm")
+        st.write(
+            f"**Ngày gửi:** {ngay_gui.strftime('%d/%m/%Y')}"
+        )
+        st.write(
+            f"**Ngày đáo hạn:** {ngay_dao_han.strftime('%d/%m/%Y')}"
+        )
+        st.write(
+            f"**Ngày rút:** {ngay_rut.strftime('%d/%m/%Y')}"
+        )
         st.write(f"**Trạng thái:** {trang_thai}")
 
         st.markdown("</div>", unsafe_allow_html=True)
@@ -393,63 +677,88 @@ if tinh_toan:
     with col2:
 
         st.markdown("""
-        <div class="result-card">
+        <div class="result-box">
         <h3>💵 Kết quả tài chính</h3>
         """, unsafe_allow_html=True)
 
         st.write(
-            f"**Tiền lãi:** {dinh_dang_tien(tien_lai)}"
+            f"**Tiền lãi:** {format_money(tien_lai)}"
         )
 
         st.write(
-            f"**Tổng tiền nhận:** {dinh_dang_tien(tong_nhan)}"
+            f"**Tổng tiền nhận:** {format_money(tong_nhan)}"
         )
 
-        if so_tien > 0:
-            ty_suat = tien_lai / so_tien * 100
-        else:
-            ty_suat = 0
+        ty_suat = (
+            tien_lai / so_tien * 100
+            if so_tien > 0
+            else 0
+        )
 
         st.write(
             f"**Tỷ suất sinh lời:** {ty_suat:.2f}%"
         )
 
         st.write(
-            f"**Phương thức:** {phuong_thuc}"
+            f"**Phương thức nhận lãi:** {phuong_thuc}"
         )
 
         st.write(
-            f"**Tái tục:** {'Có 🔄' if tai_tuc else 'Không'}"
+            f"**Tự động tái tục:** "
+            f"{'Có 🔄' if tai_tuc else 'Không'}"
         )
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # =====================================================
-    # BẢNG DÒNG TIỀN
-    # =====================================================
+    st.markdown("---")
+
+    st.markdown("### 📐 Công thức nghiệp vụ")
+
+    st.latex(
+        r"Lãi = Tiền\ gốc \times "
+        r"\frac{Lãi\ suất}{100} \times "
+        r"\frac{Số\ ngày}{365}"
+    )
+
+    st.info(
+        f"Áp dụng: {format_money(so_tien)} × "
+        f"{lai_ap_dung:.2f}% × {so_ngay}/365 "
+        f"= **{format_money(tien_lai)}**"
+    )
+
+
+# =========================================================
+# TAB 3 - DÒNG TIỀN
+# =========================================================
+
+with tab3:
 
     st.markdown("## 📋 Bảng dòng tiền chi tiết")
 
     dong_tien = pd.DataFrame({
+
         "Thời điểm": [
             "Ngày gửi",
-            "Trong thời gian gửi",
+            "Trong kỳ",
             "Ngày đáo hạn / rút"
         ],
+
         "Ngày": [
             ngay_gui.strftime("%d/%m/%Y"),
             f"{so_ngay} ngày",
             ngay_rut.strftime("%d/%m/%Y")
         ],
+
         "Dòng tiền": [
-            f"-{dinh_dang_tien(so_tien)}",
-            f"+{dinh_dang_tien(tien_lai)}",
-            f"+{dinh_dang_tien(tong_nhan)}"
+            f"-{format_money(so_tien)}",
+            f"+{format_money(tien_lai)}",
+            f"+{format_money(tong_nhan)}"
         ],
+
         "Nội dung": [
-            "Gửi tiền",
-            "Tiền lãi",
-            "Nhận tiền"
+            "Khách hàng gửi tiền",
+            "Phát sinh tiền lãi",
+            "Khách hàng nhận tiền"
         ]
     })
 
@@ -459,146 +768,171 @@ if tinh_toan:
         hide_index=True
     )
 
-    # =====================================================
-    # CÔNG THỨC
-    # =====================================================
+    st.markdown("### 📊 Biểu đồ khoản tiền")
 
-    with st.expander("📐 Công thức tính lãi"):
-
-        st.write(
-            "Lãi tiền gửi = Tiền gốc × Lãi suất năm × Số ngày / 365"
-        )
-
-        st.latex(
-            r"Lãi = P \times \frac{r}{100} \times \frac{n}{365}"
-        )
-
-        st.write(
-            f"Trong đó:"
-        )
-
-        st.write(
-            f"- P = {dinh_dang_tien(so_tien)}"
-        )
-
-        st.write(
-            f"- r = {lai_ap_dung:.2f}%/năm"
-        )
-
-        st.write(
-            f"- n = {so_ngay} ngày"
-        )
-
-    # =====================================================
-    # SO SÁNH
-    # =====================================================
-
-    st.markdown("## 📊 So sánh thông minh")
-
-    lai_ky_han = tinh_lai(
-        so_tien,
-        lai_suat,
-        so_ngay
-    )
-
-    lai_khong_ky_han = tinh_lai(
-        so_tien,
-        lai_suat_khong_ky_han,
-        so_ngay
-    )
-
-    chenhlech = lai_ky_han - lai_khong_ky_han
-
-    comparison = pd.DataFrame({
-        "Phương án": [
-            "Có kỳ hạn",
-            "Không kỳ hạn"
+    chart_data = pd.DataFrame({
+        "Khoản mục": [
+            "Tiền gốc",
+            "Tiền lãi",
+            "Tổng nhận"
         ],
-        "Lãi suất (%/năm)": [
-            lai_suat,
-            lai_suat_khong_ky_han
-        ],
-        "Tiền lãi": [
-            lai_ky_han,
-            lai_khong_ky_han
+        "Giá trị": [
+            so_tien,
+            tien_lai,
+            tong_nhan
         ]
     })
 
+    st.bar_chart(
+        chart_data.set_index("Khoản mục")
+    )
+
+
+# =========================================================
+# TAB 4 - SO SÁNH
+# =========================================================
+
+with tab4:
+
+    st.markdown("## 📈 So sánh thông minh")
+
+    ky_han_so_sanh = {
+        "1 tháng": 1,
+        "3 tháng": 3,
+        "6 tháng": 6,
+        "9 tháng": 9,
+        "12 tháng": 12,
+        "18 tháng": 18,
+        "24 tháng": 24,
+        "36 tháng": 36
+    }
+
+    data = []
+
+    for ten_ky_han, thang_i in ky_han_so_sanh.items():
+
+        ngay_end = ngay_gui + relativedelta(
+            months=thang_i
+        )
+
+        ngay_i = (ngay_end - ngay_gui).days
+
+        lai_i = tinh_lai_don(
+            so_tien,
+            lai_suat,
+            ngay_i
+        )
+
+        tong_i = so_tien + lai_i
+
+        data.append([
+            ten_ky_han,
+            ngay_i,
+            lai_suat,
+            lai_i,
+            tong_i
+        ])
+
+    comparison = pd.DataFrame(
+        data,
+        columns=[
+            "Kỳ hạn",
+            "Số ngày",
+            "Lãi suất (%/năm)",
+            "Tiền lãi",
+            "Tổng tiền nhận"
+        ]
+    )
+
     st.dataframe(
-        comparison,
+        comparison.style.format({
+            "Lãi suất (%/năm)": "{:.2f}",
+            "Tiền lãi": "{:,.0f}",
+            "Tổng tiền nhận": "{:,.0f}"
+        }),
         use_container_width=True,
         hide_index=True
     )
 
-    st.info(
-        f"💡 Chênh lệch tiền lãi giữa hai phương án: "
-        f"**{dinh_dang_tien(chenhlech)}**"
+    # Tìm phương án tốt nhất
+
+    best = comparison.loc[
+        comparison["Tiền lãi"].idxmax()
+    ]
+
+    st.success(
+        f"🏆 Với số tiền **{format_money(so_tien)}**, "
+        f"kỳ hạn **{best['Kỳ hạn']}** đang mang lại "
+        f"mức lãi cao nhất: "
+        f"**{format_money(best['Tiền lãi'])}**."
     )
 
-else:
+    st.markdown("### 📊 So sánh tiền lãi theo kỳ hạn")
 
-    # =====================================================
-    # MÀN HÌNH CHỜ
-    # =====================================================
+    chart = comparison[
+        ["Kỳ hạn", "Tiền lãi"]
+    ].set_index("Kỳ hạn")
 
-    st.markdown("## 📊 Tổng quan")
+    st.bar_chart(chart)
 
-    st.info(
-        "💡 Nhập thông tin ở **Bảng điều khiển bên trái** "
-        "rồi bấm **🔥 TÍNH TOÁN NGAY** để xem kết quả."
-    )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.markdown("""
-        <div class="card">
-        <h3>💰 Tiền gửi</h3>
-        <p>Nhập số tiền bạn muốn gửi tiết kiệm.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown("""
-        <div class="card">
-        <h3>📅 Kỳ hạn</h3>
-        <p>Lựa chọn kỳ hạn và lãi suất phù hợp.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col3:
-        st.markdown("""
-        <div class="card">
-        <h3>📊 Kết quả</h3>
-        <p>Xem tiền lãi và tổng tiền nhận được.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    st.markdown("""
-    ### 📌 Hướng dẫn sử dụng
-
-    **Bước 1:** Nhập số tiền gửi.
-
-    **Bước 2:** Chọn kỳ hạn gửi.
-
-    **Bước 3:** Nhập lãi suất.
-
-    **Bước 4:** Chọn ngày gửi và ngày rút.
-
-    **Bước 5:** Chọn phương thức nhận lãi.
-
-    **Bước 6:** Bấm **🔥 TÍNH TOÁN NGAY**.
-    """)
 
 # =========================================================
-# FOOTER
+# 10. KIẾN THỨC NGHIỆP VỤ
 # =========================================================
 
 st.markdown("---")
 
-st.caption(
-    "🏦 Hệ thống mô phỏng tính tiền gửi tiết kiệm | "
-    "Streamlit | Cơ sở tính lãi 365 ngày/năm"
+with st.expander("📚 Kiến thức nghiệp vụ tiền gửi"):
+
+    st.markdown("""
+### 1. Tiền gửi có kỳ hạn
+
+Khách hàng gửi tiền trong một khoảng thời gian
+xác định và được hưởng mức lãi suất theo kỳ hạn.
+
+### 2. Rút trước hạn
+
+Nếu khách hàng rút tiền trước ngày đáo hạn,
+hệ thống chuyển sang áp dụng **lãi suất không kỳ hạn**
+theo mô hình mô phỏng.
+
+### 3. Đáo hạn
+
+Khi đến ngày đáo hạn, khách hàng có thể nhận
+tiền gốc và tiền lãi hoặc thực hiện tái tục.
+
+### 4. Tái tục
+
+Nếu khách hàng không rút tiền khi đến hạn,
+khoản tiền có thể được tiếp tục gửi sang kỳ hạn mới.
+
+### 5. Cơ sở tính lãi
+
+Hệ thống sử dụng cơ sở:
+
+**365 ngày/năm**
+
+Công thức:
+
+**Lãi = Tiền gốc × Lãi suất × Số ngày / 365**
+""")
+
+
+# =========================================================
+# 11. FOOTER
+# =========================================================
+
+st.markdown("---")
+
+st.markdown(
+    """
+    <center>
+    🏦 <b>SMARTSAVE 360</b><br>
+    <small>
+    Hệ thống mô phỏng nghiệp vụ tiền gửi tiết kiệm |
+    Phục vụ mục đích học tập và mô phỏng
+    </small>
+    </center>
+    """,
+    unsafe_allow_html=True
 )
