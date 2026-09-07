@@ -2,12 +2,13 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 import calendar
+from textwrap import dedent
 
 
-# =========================================================
+# ============================================================
 # SMARTSAVE 360
 # HỆ THỐNG MÔ PHỎNG NGHIỆP VỤ TIỀN GỬI TIẾT KIỆM
-# =========================================================
+# ============================================================
 
 st.set_page_config(
     page_title="SmartSave 360",
@@ -17,298 +18,345 @@ st.set_page_config(
 )
 
 
-# =========================================================
-# CSS GIAO DIỆN
-# =========================================================
-
-st.markdown("""
-<style>
-
-.stApp {
-    background-color: #f7f8fb;
-}
-
-
-/* =========================
-   SIDEBAR
-   ========================= */
-
-section[data-testid="stSidebar"] {
-    background-color: #eef0f4 !important;
-    width: 360px !important;
-}
-
-section[data-testid="stSidebar"] > div {
-    width: 360px !important;
-}
-
-section[data-testid="stSidebar"] .block-container {
-    padding: 28px 22px 40px 22px !important;
-}
-
-
-/* =========================
-   BẢNG ĐIỀU KHIỂN
-   ========================= */
-
-.dashboard-box {
-    background: linear-gradient(
-        135deg,
-        #101b50,
-        #15588e
-    );
-
-    color: white;
-
-    border-radius: 15px;
-
-    padding: 23px 15px;
-
-    margin-bottom: 25px;
-
-    text-align: center;
-
-    box-shadow: 0 8px 22px rgba(16, 35, 75, 0.22);
-}
-
-.dashboard-title {
-    font-size: 19px;
-    font-weight: 800;
-    margin-bottom: 7px;
-}
-
-.dashboard-subtitle {
-    font-size: 11px;
-    opacity: 0.9;
-}
-
-
-/* =========================
-   SIDEBAR INPUT
-   ========================= */
-
-.sidebar-heading {
-    font-size: 16px;
-    font-weight: 800;
-    color: #202a3d;
-    margin-top: 8px;
-    margin-bottom: 10px;
-}
-
-.money-selected {
-    background-color: #dceaff;
-    color: #135494;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    margin: 12px 0 18px 0;
-}
-
-
-/* =========================
-   MAIN HERO
-   ========================= */
-
-.hero-box {
-    background: linear-gradient(
-        135deg,
-        #10184c 0%,
-        #123e70 50%,
-        #155d8b 100%
-    );
-
-    color: white;
-
-    border-radius: 18px;
-
-    padding: 38px 40px;
-
-    min-height: 270px;
-
-    box-shadow: 0 10px 28px rgba(15, 30, 70, 0.20);
-
-    margin-bottom: 20px;
-}
-
-.hero-title {
-    font-size: 32px;
-    font-weight: 850;
-    margin-bottom: 12px;
-}
-
-.hero-subtitle {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 24px;
-}
-
-.hero-line {
-    font-size: 13px;
-    margin: 16px 0;
-    line-height: 1.6;
-}
-
-
-/* =========================
-   CARD
-   ========================= */
-
-.card {
-    background: white;
-    border-radius: 15px;
-    padding: 22px;
-    border: 1px solid #e4e8ee;
-    box-shadow: 0 5px 18px rgba(0,0,0,0.045);
-    margin-bottom: 18px;
-}
-
-.card-title {
-    color: #153d6b;
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 12px;
-}
-
-
-/* =========================
-   KẾT QUẢ
-   ========================= */
-
-.result-card {
-    background: linear-gradient(
-        135deg,
-        #edf6ff,
-        #ffffff
-    );
-
-    border: 1px solid #d8e7f5;
-
-    border-radius: 15px;
-
-    padding: 22px;
-
-    margin-bottom: 18px;
-}
-
-.result-number {
-    color: #124b82;
-    font-size: 23px;
-    font-weight: 850;
-}
-
-
-/* =========================
-   METRIC
-   ========================= */
-
-.metric-card {
-    background: white;
-    border: 1px solid #e1e6ed;
-    border-radius: 13px;
-    padding: 19px 12px;
-    text-align: center;
-    min-height: 105px;
-    box-shadow: 0 4px 13px rgba(0,0,0,0.04);
-}
-
-.metric-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: #667085;
-}
-
-.metric-value {
-    font-size: 19px;
-    font-weight: 850;
-    color: #123f70;
-    margin-top: 8px;
-}
-
-
-/* =========================
-   BUTTON
-   ========================= */
-
-.stButton > button {
-    border-radius: 9px !important;
-    font-weight: 700 !important;
-}
-
-
-/* =========================
-   PRIMARY BUTTON
-   ========================= */
-
-.stButton > button[kind="primary"] {
-    background: linear-gradient(
-        135deg,
-        #102052,
-        #155e91
-    ) !important;
-
-    color: white !important;
-
-    border: none !important;
-
-    min-height: 48px !important;
-}
-
-
-/* =========================
-   TAB
-   ========================= */
-
-button[data-baseweb="tab"] {
-    font-weight: 750 !important;
-}
-
-
-/* =========================
-   MOBILE
-   ========================= */
-
-@media (max-width: 900px) {
+# ============================================================
+# CSS
+# ============================================================
+
+st.markdown(
+    dedent("""
+    <style>
+
+    /* ==============================
+       TOÀN BỘ TRANG
+       ============================== */
+
+    .stApp {
+        background: #f7f8fb;
+    }
+
+    .main .block-container {
+        max-width: 1500px;
+        padding: 28px 35px 60px 35px;
+    }
+
+
+    /* ==============================
+       SIDEBAR
+       ============================== */
 
     section[data-testid="stSidebar"] {
-        width: 310px !important;
+        background: #eef0f4 !important;
+        width: 365px !important;
+        min-width: 365px !important;
+        max-width: 365px !important;
     }
 
     section[data-testid="stSidebar"] > div {
-        width: 310px !important;
+        width: 365px !important;
     }
+
+    section[data-testid="stSidebar"] .block-container {
+        padding: 25px 20px 40px 20px !important;
+    }
+
+
+    /* ==============================
+       BẢNG ĐIỀU KHIỂN
+       ============================== */
+
+    .dashboard-box {
+        width: 100%;
+        min-height: 125px;
+
+        background: linear-gradient(
+            135deg,
+            #101b50 0%,
+            #185b91 100%
+        );
+
+        border-radius: 16px;
+
+        padding: 27px 15px;
+
+        text-align: center;
+
+        color: white;
+
+        box-shadow:
+            0 9px 22px rgba(12, 35, 75, 0.22);
+
+        margin-bottom: 27px;
+    }
+
+    .dashboard-box h2 {
+        color: white !important;
+
+        font-size: 21px !important;
+
+        font-weight: 800 !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+    }
+
+    .dashboard-box p {
+        color: white !important;
+
+        font-size: 12px !important;
+
+        margin: 13px 0 0 0 !important;
+    }
+
+
+    /* ==============================
+       SIDEBAR
+       ============================== */
+
+    .side-heading {
+        font-size: 17px;
+
+        font-weight: 800;
+
+        color: #202b40;
+
+        margin-top: 13px;
+
+        margin-bottom: 10px;
+    }
+
+    .selected-money {
+        background: #dceaff;
+
+        border-radius: 9px;
+
+        padding: 13px 12px;
+
+        color: #135596;
+
+        font-size: 12px;
+
+        font-weight: 750;
+
+        margin-top: 10px;
+
+        margin-bottom: 18px;
+    }
+
+
+    /* ==============================
+       HERO
+       ============================== */
 
     .hero-box {
-        padding: 27px;
+        background: linear-gradient(
+            135deg,
+            #10194d 0%,
+            #123c6d 48%,
+            #175e8f 100%
+        );
+
+        border-radius: 19px;
+
+        padding: 37px 42px;
+
+        min-height: 285px;
+
+        color: white;
+
+        box-shadow:
+            0 12px 30px rgba(15, 32, 75, 0.20);
+
+        margin-bottom: 25px;
     }
 
-    .hero-title {
+    .hero-box h1 {
+        color: white !important;
+
+        font-size: 32px !important;
+
+        font-weight: 850 !important;
+
+        margin: 0 0 10px 0 !important;
+    }
+
+    .hero-box .hero-subtitle {
+        color: white;
+
+        font-size: 14px;
+
+        font-weight: 650;
+
+        margin-bottom: 24px;
+    }
+
+    .hero-box .hero-item {
+        color: white;
+
+        font-size: 13px;
+
+        margin: 15px 0;
+
+        line-height: 1.6;
+    }
+
+
+    /* ==============================
+       CARD
+       ============================== */
+
+    .white-card {
+        background: white;
+
+        border: 1px solid #e1e6ed;
+
+        border-radius: 15px;
+
+        padding: 22px;
+
+        min-height: 200px;
+
+        box-shadow:
+            0 5px 17px rgba(0,0,0,0.04);
+    }
+
+    .blue-card {
+        background: #edf6ff;
+
+        border: 1px solid #d6e7f7;
+
+        border-radius: 15px;
+
+        padding: 22px;
+
+        min-height: 200px;
+
+        box-shadow:
+            0 5px 17px rgba(0,0,0,0.04);
+    }
+
+    .card-title {
+        color: #123f70;
+
+        font-size: 18px;
+
+        font-weight: 800;
+
+        margin-bottom: 16px;
+    }
+
+
+    /* ==============================
+       KẾT QUẢ LỚN
+       ============================== */
+
+    .big-result {
+        background: linear-gradient(
+            135deg,
+            #edf6ff,
+            #ffffff
+        );
+
+        border: 1px solid #d7e7f6;
+
+        border-radius: 15px;
+
+        padding: 22px;
+
+        margin-top: 10px;
+    }
+
+    .big-result-title {
+        color: #123f70;
+
+        font-size: 16px;
+
+        font-weight: 800;
+    }
+
+    .big-result-value {
+        color: #123f70;
+
         font-size: 27px;
+
+        font-weight: 850;
+
+        margin-top: 7px;
     }
-}
-
-</style>
-""", unsafe_allow_html=True)
 
 
-# =========================================================
-# HÀM TÍNH TOÁN
-# =========================================================
+    /* ==============================
+       BUTTON
+       ============================== */
 
-def format_money(number):
-    return f"{number:,.0f} VNĐ"
+    .stButton > button {
+        border-radius: 9px !important;
+
+        min-height: 42px !important;
+
+        font-weight: 700 !important;
+    }
+
+
+    /* ==============================
+       MOBILE
+       ============================== */
+
+    @media (max-width: 900px) {
+
+        section[data-testid="stSidebar"] {
+            width: 310px !important;
+
+            min-width: 310px !important;
+
+            max-width: 310px !important;
+        }
+
+        section[data-testid="stSidebar"] > div {
+            width: 310px !important;
+        }
+
+        .hero-box {
+            padding: 28px;
+        }
+
+        .hero-box h1 {
+            font-size: 27px !important;
+        }
+    }
+
+    </style>
+    """),
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
+# HÀM HỖ TRỢ
+# ============================================================
+
+def format_money(value):
+    return f"{value:,.0f} VNĐ"
 
 
 def calculate_interest(principal, rate, days):
     if principal <= 0 or days <= 0:
         return 0
-    return principal * rate / 100 * days / 365
+
+    return principal * (rate / 100) * days / 365
 
 
 def add_months(original_date, months):
-    month = original_date.month - 1 + months
-    year = original_date.year + month // 12
-    month = month % 12 + 1
+    total_month = (
+        original_date.year * 12
+        + original_date.month
+        - 1
+        + months
+    )
+
+    year = total_month // 12
+
+    month = total_month % 12 + 1
 
     day = min(
         original_date.day,
@@ -318,7 +366,7 @@ def add_months(original_date, months):
     return date(year, month, day)
 
 
-def create_monthly_table(
+def monthly_interest_table(
     principal,
     rate,
     start_date,
@@ -328,6 +376,7 @@ def create_monthly_table(
     rows = []
 
     current = start_date
+
     month_number = 1
 
     while current < end_date:
@@ -340,7 +389,9 @@ def create_monthly_table(
         if next_date > end_date:
             next_date = end_date
 
-        days = (next_date - current).days
+        days = (
+            next_date - current
+        ).days
 
         if days <= 0:
             break
@@ -351,65 +402,70 @@ def create_monthly_table(
             days
         )
 
-        rows.append({
-            "Tháng": month_number,
-            "Từ ngày": current,
-            "Đến ngày": next_date,
-            "Số ngày": days,
-            "Tiền lãi": interest
-        })
+        rows.append(
+            {
+                "Tháng": month_number,
+                "Từ ngày": current.strftime(
+                    "%d/%m/%Y"
+                ),
+                "Đến ngày": next_date.strftime(
+                    "%d/%m/%Y"
+                ),
+                "Số ngày": days,
+                "Tiền lãi": interest
+            }
+        )
 
         current = next_date
+
         month_number += 1
 
     return pd.DataFrame(rows)
 
 
-# =========================================================
+# ============================================================
 # SESSION STATE
-# =========================================================
+# ============================================================
 
 if "principal" not in st.session_state:
+
     st.session_state.principal = 50_000_000.0
 
-if "start_date" not in st.session_state:
-    st.session_state.start_date = date.today()
 
-if "calculate" not in st.session_state:
-    st.session_state.calculate = False
+def set_money(value):
 
-
-def change_money(value):
     st.session_state.principal = float(value)
 
 
-# =========================================================
+# ============================================================
 # SIDEBAR
-# =========================================================
+# ============================================================
 
 with st.sidebar:
 
-    st.markdown("""
+    # -----------------------------------------
+    # BẢNG ĐIỀU KHIỂN
+    # -----------------------------------------
+
+    dashboard_html = dedent("""
     <div class="dashboard-box">
-
-        <div class="dashboard-title">
-            🎛️ BẢNG ĐIỀU KHIỂN
-        </div>
-
-        <div class="dashboard-subtitle">
-            Thiết lập khoản tiền gửi
-        </div>
-
+        <h2>🎛️ BẢNG ĐIỀU KHIỂN</h2>
+        <p>Thiết lập khoản tiền gửi</p>
     </div>
-    """, unsafe_allow_html=True)
-
-
-    # -----------------------------------------------------
-    # SỐ TIỀN
-    # -----------------------------------------------------
+    """)
 
     st.markdown(
-        '<div class="sidebar-heading">💰 Số tiền gửi</div>',
+        dashboard_html,
+        unsafe_allow_html=True
+    )
+
+
+    # -----------------------------------------
+    # SỐ TIỀN
+    # -----------------------------------------
+
+    st.markdown(
+        '<div class="side-heading">💰 Số tiền gửi</div>',
         unsafe_allow_html=True
     )
 
@@ -421,65 +477,76 @@ with st.sidebar:
         key="principal"
     )
 
-    st.markdown(
+    selected_money_html = dedent(
         f"""
-        <div class="money-selected">
-            💵 Đang chọn:
-            {format_money(st.session_state.principal)}
+        <div class="selected-money">
+            💵 Đang chọn: {format_money(
+                st.session_state.principal
+            )}
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
-
-
-    # -----------------------------------------------------
-    # CHỌN NHANH
-    # -----------------------------------------------------
 
     st.markdown(
-        '<div class="sidebar-heading">⚡ Chọn nhanh</div>',
+        selected_money_html,
         unsafe_allow_html=True
     )
 
-    c1, c2 = st.columns(2)
 
-    with c1:
+    # -----------------------------------------
+    # CHỌN NHANH
+    # -----------------------------------------
+
+    st.markdown(
+        '<div class="side-heading">⚡ Chọn nhanh</div>',
+        unsafe_allow_html=True
+    )
+
+    col_a, col_b = st.columns(2)
+
+    with col_a:
 
         st.button(
             "💰 50 triệu",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(50_000_000,)
         )
 
         st.button(
             "💰 200 triệu",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(200_000_000,)
         )
 
         st.button(
             "💰 500 triệu",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(500_000_000,)
         )
 
-    with c2:
+    with col_b:
 
         st.button(
             "💰 100 triệu",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(100_000_000,)
         )
 
         st.button(
             "💰 1 tỷ",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(1_000_000_000,)
         )
 
         st.button(
             "💰 2 tỷ",
-            on_click=change_money,
+            use_container_width=True,
+            on_click=set_money,
             args=(2_000_000_000,)
         )
 
@@ -487,16 +554,16 @@ with st.sidebar:
     st.markdown("---")
 
 
-    # -----------------------------------------------------
+    # -----------------------------------------
     # KỲ HẠN
-    # -----------------------------------------------------
+    # -----------------------------------------
 
     st.markdown(
-        '<div class="sidebar-heading">📅 Kỳ hạn & lãi suất</div>',
+        '<div class="side-heading">📅 Kỳ hạn</div>',
         unsafe_allow_html=True
     )
 
-    terms = {
+    term_options = {
         "Không kỳ hạn": 0,
         "1 tháng": 1,
         "3 tháng": 3,
@@ -509,12 +576,22 @@ with st.sidebar:
     }
 
     term_name = st.selectbox(
-        "Kỳ hạn gửi tiền",
-        list(terms.keys()),
+        "Chọn kỳ hạn",
+        list(term_options.keys()),
         index=2
     )
 
-    term_months = terms[term_name]
+    term_months = term_options[term_name]
+
+
+    # -----------------------------------------
+    # LÃI SUẤT
+    # -----------------------------------------
+
+    st.markdown(
+        '<div class="side-heading">📈 Lãi suất</div>',
+        unsafe_allow_html=True
+    )
 
     fixed_rate = st.number_input(
         "Lãi suất có kỳ hạn (%/năm)",
@@ -534,18 +611,18 @@ with st.sidebar:
     st.markdown("---")
 
 
-    # -----------------------------------------------------
+    # -----------------------------------------
     # NGÀY GỬI
-    # -----------------------------------------------------
+    # -----------------------------------------
 
     st.markdown(
-        '<div class="sidebar-heading">🗓️ Thời gian</div>',
+        '<div class="side-heading">🗓️ Thời gian</div>',
         unsafe_allow_html=True
     )
 
     start_date = st.date_input(
         "Ngày gửi",
-        key="start_date"
+        value=date.today()
     )
 
     if term_months > 0:
@@ -560,12 +637,10 @@ with st.sidebar:
         maturity_date = start_date
 
 
-    if term_months > 0:
-
-        st.caption(
-            "📌 Ngày đáo hạn: "
-            + maturity_date.strftime("%d/%m/%Y")
-        )
+    st.caption(
+        "📌 Ngày đáo hạn: "
+        + maturity_date.strftime("%d/%m/%Y")
+    )
 
 
     end_date = st.date_input(
@@ -578,12 +653,12 @@ with st.sidebar:
     st.markdown("---")
 
 
-    # -----------------------------------------------------
+    # -----------------------------------------
     # PHƯƠNG THỨC NHẬN LÃI
-    # -----------------------------------------------------
+    # -----------------------------------------
 
     st.markdown(
-        '<div class="sidebar-heading">💵 Phương thức nhận lãi</div>',
+        '<div class="side-heading">💵 Phương thức nhận lãi</div>',
         unsafe_allow_html=True
     )
 
@@ -597,43 +672,14 @@ with st.sidebar:
         index=2
     )
 
-
-    auto_rollover = st.checkbox(
+    rollover = st.checkbox(
         "🔄 Tự động tái tục khi đáo hạn"
     )
 
 
-    st.markdown("---")
-
-
-    # -----------------------------------------------------
-    # NÚT TÍNH
-    # -----------------------------------------------------
-
-    if st.button(
-        "🔥 TÍNH TOÁN NGAY",
-        type="primary",
-        use_container_width=True
-    ):
-
-        st.session_state.calculate = True
-
-
-    if st.button(
-        "🔄 Đặt lại",
-        use_container_width=True
-    ):
-
-        st.session_state.principal = 50_000_000.0
-        st.session_state.start_date = date.today()
-        st.session_state.calculate = False
-
-        st.rerun()
-
-
-# =========================================================
-# TÍNH KẾT QUẢ
-# =========================================================
+# ============================================================
+# TÍNH TOÁN
+# ============================================================
 
 principal = st.session_state.principal
 
@@ -646,19 +692,27 @@ actual_days = max(
 if term_months == 0:
 
     applied_rate = non_term_rate
+
     status = "🔵 Không kỳ hạn"
+
     early_withdrawal = False
+
 
 elif end_date < maturity_date:
 
     applied_rate = non_term_rate
+
     status = "🔴 Rút trước hạn"
+
     early_withdrawal = True
+
 
 else:
 
     applied_rate = fixed_rate
+
     status = "🟢 Đúng hạn"
+
     early_withdrawal = False
 
 
@@ -669,257 +723,143 @@ interest = calculate_interest(
 )
 
 
-# =========================================================
-# BẢNG LÃI HÀNG THÁNG
-# =========================================================
+# ============================================================
+# HERO
+# ============================================================
 
-monthly_table = pd.DataFrame()
-
-if (
-    interest_method == "Nhận lãi hàng tháng"
-    and actual_days > 0
-):
-
-    monthly_table = create_monthly_table(
-        principal,
-        applied_rate,
-        start_date,
-        end_date
-    )
-
-
-if not monthly_table.empty:
-
-    total_monthly_interest = monthly_table[
-        "Tiền lãi"
-    ].sum()
-
-else:
-
-    total_monthly_interest = 0
-
-
-# =========================================================
-# TỔNG NHẬN
-# =========================================================
-
-if interest_method == "Nhận lãi hàng tháng":
-
-    total_received = (
-        principal
-        + total_monthly_interest
-    )
-
-    displayed_interest = total_monthly_interest
-
-else:
-
-    total_received = (
-        principal
-        + interest
-    )
-
-    displayed_interest = interest
-
-
-# =========================================================
-# MAIN HERO
-# =========================================================
-
-st.markdown("""
+hero_html = dedent("""
 <div class="hero-box">
 
-    <div class="hero-title">
-        🏦 SMARTSAVE 360
-    </div>
+    <h1>🏦 SMARTSAVE 360</h1>
 
     <div class="hero-subtitle">
         Hệ thống mô phỏng nghiệp vụ tiền gửi tiết kiệm
     </div>
 
-    <div class="hero-line">
+    <div class="hero-item">
         🔴 Rút trước hạn → áp dụng lãi suất không kỳ hạn
     </div>
 
-    <div class="hero-line">
+    <div class="hero-item">
         🟢 Đến hạn → nhận lãi hoặc tái tục
     </div>
 
-    <div class="hero-line">
+    <div class="hero-item">
         📅 Cơ sở tính lãi: 365 ngày/năm
     </div>
 
 </div>
-""", unsafe_allow_html=True)
+""")
+
+st.markdown(
+    hero_html,
+    unsafe_allow_html=True
+)
 
 
-# =========================================================
+# ============================================================
 # TABS
-# =========================================================
+# ============================================================
 
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Tổng quan",
-    "💰 Tính tiền gửi",
-    "📋 Dòng tiền",
-    "📈 So sánh thông minh"
-])
-
-
-# =========================================================
-# TAB 1
-# =========================================================
-
-with tab1:
-
-    st.markdown("## 📊 Tổng quan")
-
-    if not st.session_state.calculate:
-
-        st.info(
-            "💡 Hãy thiết lập thông tin ở "
-            "**Bảng điều khiển** bên trái "
-            "và nhấn **TÍNH TOÁN NGAY**."
-        )
+tab_overview, tab_calculate, tab_cashflow, tab_compare = st.tabs(
+    [
+        "📊 Tổng quan",
+        "💰 Tính tiền gửi",
+        "📋 Dòng tiền",
+        "📈 So sánh thông minh"
+    ]
+)
 
 
-    # -----------------------------------------------------
-    # METRIC
-    # -----------------------------------------------------
+# ============================================================
+# TAB 1 - TỔNG QUAN
+# ============================================================
 
-    col1, col2, col3, col4 = st.columns(4)
+with tab_overview:
 
+    st.markdown(
+        "## 💰 Chi tiết khoản tiền gửi"
+    )
+
+
+    # -----------------------------------------
+    # 3 CHỈ SỐ
+    # -----------------------------------------
+
+    col1, col2, col3 = st.columns(3)
 
     with col1:
 
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    💰 TIỀN GỐC
-                </div>
-
-                <div class="metric-value">
-                    {format_money(principal)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "💵 TIỀN GỐC",
+            format_money(principal)
         )
-
 
     with col2:
 
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    📈 TIỀN LÃI
-                </div>
-
-                <div class="metric-value">
-                    {format_money(displayed_interest)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "📈 TIỀN LÃI",
+            format_money(interest)
         )
-
 
     with col3:
 
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    💎 TỔNG NHẬN
-                </div>
-
-                <div class="metric-value">
-                    {format_money(total_received)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            "💎 TỔNG NHẬN",
+            format_money(
+                principal + interest
+            )
         )
 
 
-    with col4:
-
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    📅 SỐ NGÀY
-                </div>
-
-                <div class="metric-value">
-                    {actual_days} ngày
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-    st.markdown("")
-
-
-    # -----------------------------------------------------
+    # -----------------------------------------
     # TRẠNG THÁI
-    # -----------------------------------------------------
+    # -----------------------------------------
 
     if early_withdrawal:
 
         st.error(
-            f"🔴 Rút trước hạn — "
-            f"lãi suất áp dụng "
+            "🔴 Rút trước hạn → "
+            f"áp dụng lãi suất "
             f"{non_term_rate:.2f}%/năm."
         )
 
     elif term_months == 0:
 
         st.info(
-            f"🔵 Không kỳ hạn — "
-            f"lãi suất áp dụng "
+            "🔵 Không kỳ hạn → "
+            f"áp dụng lãi suất "
             f"{non_term_rate:.2f}%/năm."
         )
 
     else:
 
         st.success(
-            f"🟢 Đúng hạn — "
-            f"lãi suất áp dụng "
+            "🟢 Đúng hạn → "
+            f"áp dụng lãi suất "
             f"{fixed_rate:.2f}%/năm."
         )
 
 
-    # -----------------------------------------------------
-    # 2 CARD
-    # -----------------------------------------------------
+    # -----------------------------------------
+    # HAI CARD
+    # -----------------------------------------
 
-    left, right = st.columns(2)
+    left_col, right_col = st.columns(2)
 
 
-    with left:
+    with left_col:
 
-        st.markdown(
+        left_html = dedent(
             f"""
-            <div class="card">
+            <div class="white-card">
 
                 <div class="card-title">
                     🏦 Thông tin khoản gửi
                 </div>
 
                 <p>
-                    <b>Số tiền:</b>
+                    <b>Số tiền gửi:</b>
                     {format_money(principal)}
                 </p>
 
@@ -934,24 +874,38 @@ with tab1:
                 </p>
 
                 <p>
+                    <b>Ngày đáo hạn:</b>
+                    {maturity_date.strftime("%d/%m/%Y")}
+                </p>
+
+                <p>
                     <b>Ngày rút:</b>
                     {end_date.strftime("%d/%m/%Y")}
                 </p>
 
+                <p>
+                    <b>Số ngày thực tế:</b>
+                    {actual_days} ngày
+                </p>
+
             </div>
-            """,
+            """
+        )
+
+        st.markdown(
+            left_html,
             unsafe_allow_html=True
         )
 
 
-    with right:
+    with right_col:
 
-        st.markdown(
+        right_html = dedent(
             f"""
-            <div class="result-card">
+            <div class="blue-card">
 
                 <div class="card-title">
-                    💵 Kết quả tài chính
+                    💰 Kết quả tài chính
                 </div>
 
                 <p>
@@ -961,178 +915,145 @@ with tab1:
 
                 <p>
                     <b>Tiền lãi:</b>
-                    {format_money(displayed_interest)}
+                    {format_money(interest)}
                 </p>
 
                 <p>
                     <b>Tổng tiền nhận:</b>
-                    {format_money(total_received)}
+                    {format_money(principal + interest)}
+                </p>
+
+                <p>
+                    <b>Trạng thái:</b>
+                    {status}
+                </p>
+
+                <p>
+                    <b>Tái tục:</b>
+                    {"Có 🔄" if rollover else "Không"}
                 </p>
 
             </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-# =========================================================
-# TAB 2
-# =========================================================
-
-with tab2:
-
-    st.markdown("## 💰 Chi tiết khoản tiền gửi")
-
-
-    col1, col2 = st.columns(2)
-
-
-    with col1:
-
-        st.markdown(
-            '<div class="card">',
-            unsafe_allow_html=True
+            """
         )
 
         st.markdown(
-            '<div class="card-title">📌 Thông tin khoản tiền gửi</div>',
-            unsafe_allow_html=True
-        )
-
-        st.write(
-            f"**Số tiền gửi:** "
-            f"{format_money(principal)}"
-        )
-
-        st.write(
-            f"**Kỳ hạn:** {term_name}"
-        )
-
-        st.write(
-            f"**Lãi suất niêm yết:** "
-            f"{fixed_rate:.2f}%/năm"
-        )
-
-        st.write(
-            f"**Lãi suất áp dụng:** "
-            f"{applied_rate:.2f}%/năm"
-        )
-
-        st.write(
-            f"**Ngày gửi:** "
-            f"{start_date.strftime('%d/%m/%Y')}"
-        )
-
-        st.write(
-            f"**Ngày đáo hạn:** "
-            f"{maturity_date.strftime('%d/%m/%Y')}"
-        )
-
-        st.write(
-            f"**Ngày rút:** "
-            f"{end_date.strftime('%d/%m/%Y')}"
-        )
-
-        st.write(
-            f"**Số ngày thực tế:** "
-            f"{actual_days} ngày"
-        )
-
-        st.markdown(
-            "</div>",
+            right_html,
             unsafe_allow_html=True
         )
 
 
-    with col2:
+# ============================================================
+# TAB 2 - TÍNH TIỀN GỬI
+# ============================================================
 
-        st.markdown(
-            '<div class="result-card">',
-            unsafe_allow_html=True
-        )
+with tab_calculate:
 
-        st.markdown(
-            '<div class="card-title">💰 Kết quả tính toán</div>',
-            unsafe_allow_html=True
-        )
-
-        st.write(
-            f"**Tiền gốc:** "
-            f"{format_money(principal)}"
-        )
-
-        st.write(
-            f"**Tiền lãi:** "
-            f"{format_money(displayed_interest)}"
-        )
-
-        st.write(
-            f"**Tổng tiền nhận:** "
-            f"{format_money(total_received)}"
-        )
-
-        profit_rate = 0
-
-        if principal > 0:
-
-            profit_rate = (
-                displayed_interest
-                / principal
-                * 100
-            )
-
-        st.write(
-            f"**Tỷ suất sinh lời:** "
-            f"{profit_rate:.2f}%"
-        )
-
-        st.write(
-            f"**Trạng thái:** {status}"
-        )
-
-        st.write(
-            f"**Tái tục:** "
-            f"{'Có 🔄' if auto_rollover else 'Không'}"
-        )
-
-        st.markdown(
-            "</div>",
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        "## 💰 Tính tiền gửi"
+    )
 
 
-    # -----------------------------------------------------
-    # CÔNG THỨC
-    # -----------------------------------------------------
+    formula_html = dedent("""
+    <div class="white-card">
 
-    st.markdown("---")
+        <div class="card-title">
+            📐 Công thức tính lãi
+        </div>
 
-    st.markdown("### 📐 Công thức tính lãi")
+        <p>
+            Tiền lãi được tính dựa trên tiền gốc,
+            lãi suất và số ngày gửi thực tế.
+        </p>
+
+    </div>
+    """)
+
+    st.markdown(
+        formula_html,
+        unsafe_allow_html=True
+    )
+
 
     st.latex(
         r"""
-        Tiền\ lãi =
-        Tiền\ gốc
+        I =
+        P \times
+        \frac{r}{100}
         \times
-        \frac{Lãi\ suất}{100}
-        \times
-        \frac{Số\ ngày}{365}
+        \frac{n}{365}
         """
     )
 
-    st.info(
-        f"{format_money(principal)} × "
-        f"{applied_rate:.2f}% × "
-        f"{actual_days}/365 = "
-        f"**{format_money(interest)}**"
+
+    st.write(
+        f"**P - Tiền gốc:** "
+        f"{format_money(principal)}"
+    )
+
+    st.write(
+        f"**r - Lãi suất:** "
+        f"{applied_rate:.2f}%/năm"
+    )
+
+    st.write(
+        f"**n - Số ngày:** "
+        f"{actual_days} ngày"
     )
 
 
-    # -----------------------------------------------------
-    # LÃI HÀNG THÁNG
-    # -----------------------------------------------------
+    result_html = dedent(
+        f"""
+        <div class="big-result">
 
-    if not monthly_table.empty:
+            <div class="big-result-title">
+                💰 TIỀN LÃI
+            </div>
+
+            <div class="big-result-value">
+                {format_money(interest)}
+            </div>
+
+        </div>
+        """
+    )
+
+    st.markdown(
+        result_html,
+        unsafe_allow_html=True
+    )
+
+
+    st.markdown("")
+
+
+    result_html_2 = dedent(
+        f"""
+        <div class="big-result">
+
+            <div class="big-result-title">
+                💎 TỔNG TIỀN NHẬN
+            </div>
+
+            <div class="big-result-value">
+                {format_money(principal + interest)}
+            </div>
+
+        </div>
+        """
+    )
+
+    st.markdown(
+        result_html_2,
+        unsafe_allow_html=True
+    )
+
+
+    # -----------------------------------------
+    # LÃI HÀNG THÁNG
+    # -----------------------------------------
+
+    if interest_method == "Nhận lãi hàng tháng":
 
         st.markdown("---")
 
@@ -1140,124 +1061,141 @@ with tab2:
             "### 📅 Lịch nhận lãi hàng tháng"
         )
 
-        table_show = monthly_table.copy()
-
-        table_show["Từ ngày"] = (
-            table_show["Từ ngày"]
-            .dt.strftime("%d/%m/%Y")
+        monthly_df = monthly_interest_table(
+            principal,
+            applied_rate,
+            start_date,
+            end_date
         )
 
-        table_show["Đến ngày"] = (
-            table_show["Đến ngày"]
-            .dt.strftime("%d/%m/%Y")
+        if not monthly_df.empty:
+
+            display_monthly = monthly_df.copy()
+
+            display_monthly["Tiền lãi"] = (
+                display_monthly["Tiền lãi"]
+                .apply(format_money)
+            )
+
+            st.dataframe(
+                display_monthly,
+                use_container_width=True,
+                hide_index=True
+            )
+
+        else:
+
+            st.info(
+                "Khoản gửi chưa đủ thời gian để "
+                "hiển thị lịch lãi hàng tháng."
+            )
+
+
+# ============================================================
+# TAB 3 - DÒNG TIỀN
+# ============================================================
+
+with tab_cashflow:
+
+    st.markdown(
+        "## 📋 Dòng tiền khoản gửi"
+    )
+
+
+    cashflow_rows = []
+
+
+    cashflow_rows.append(
+        {
+            "Thời điểm": "Ngày gửi",
+            "Ngày": start_date.strftime(
+                "%d/%m/%Y"
+            ),
+            "Dòng tiền": -principal,
+            "Nội dung": "Gửi tiền"
+        }
+    )
+
+
+    if interest_method == "Nhận lãi hàng tháng":
+
+        monthly_df = monthly_interest_table(
+            principal,
+            applied_rate,
+            start_date,
+            end_date
         )
 
-        table_show["Tiền lãi"] = (
-            table_show["Tiền lãi"]
-            .apply(format_money)
+        if not monthly_df.empty:
+
+            for _, row in monthly_df.iterrows():
+
+                cashflow_rows.append(
+                    {
+                        "Thời điểm":
+                            f"Tháng {int(row['Tháng'])}",
+
+                        "Ngày":
+                            row["Đến ngày"],
+
+                        "Dòng tiền":
+                            row["Tiền lãi"],
+
+                        "Nội dung":
+                            "Nhận lãi hàng tháng"
+                    }
+                )
+
+
+        cashflow_rows.append(
+            {
+                "Thời điểm": "Ngày rút",
+
+                "Ngày": end_date.strftime(
+                    "%d/%m/%Y"
+                ),
+
+                "Dòng tiền": principal,
+
+                "Nội dung": "Nhận lại tiền gốc"
+            }
         )
-
-        st.dataframe(
-            table_show,
-            use_container_width=True,
-            hide_index=True
-        )
-
-
-# =========================================================
-# TAB 3
-# =========================================================
-
-with tab3:
-
-    st.markdown("## 📋 Dòng tiền khoản gửi")
-
-
-    cashflows = []
-
-
-    cashflows.append({
-        "Thời điểm": "Ngày gửi",
-        "Ngày": start_date.strftime("%d/%m/%Y"),
-        "Dòng tiền": -principal,
-        "Nội dung": "Gửi tiền"
-    })
-
-
-    if (
-        interest_method == "Nhận lãi hàng tháng"
-        and not monthly_table.empty
-    ):
-
-        for _, row in monthly_table.iterrows():
-
-            cashflows.append({
-
-                "Thời điểm":
-                    f"Tháng {int(row['Tháng'])}",
-
-                "Ngày":
-                    row["Đến ngày"].strftime(
-                        "%d/%m/%Y"
-                    ),
-
-                "Dòng tiền":
-                    row["Tiền lãi"],
-
-                "Nội dung":
-                    "Nhận lãi hàng tháng"
-
-            })
-
-
-        cashflows.append({
-
-            "Thời điểm": "Ngày rút",
-
-            "Ngày":
-                end_date.strftime("%d/%m/%Y"),
-
-            "Dòng tiền": principal,
-
-            "Nội dung":
-                "Nhận lại tiền gốc"
-
-        })
 
 
     else:
 
-        cashflows.append({
+        cashflow_rows.append(
+            {
+                "Thời điểm": "Ngày rút",
 
-            "Thời điểm": "Ngày rút",
+                "Ngày": end_date.strftime(
+                    "%d/%m/%Y"
+                ),
 
-            "Ngày":
-                end_date.strftime("%d/%m/%Y"),
+                "Dòng tiền":
+                    principal + interest,
 
-            "Dòng tiền":
-                total_received,
-
-            "Nội dung":
-                "Nhận gốc + lãi"
-
-        })
+                "Nội dung":
+                    "Nhận gốc + lãi"
+            }
+        )
 
 
     cashflow_df = pd.DataFrame(
-        cashflows
+        cashflow_rows
     )
 
 
-    cashflow_show = cashflow_df.copy()
+    display_cashflow = cashflow_df.copy()
 
-    cashflow_show["Dòng tiền"] = (
-        cashflow_show["Dòng tiền"]
+    display_cashflow["Dòng tiền"] = (
+        display_cashflow["Dòng tiền"]
         .apply(format_money)
     )
 
 
     st.dataframe(
-        cashflow_show,
+        display_cashflow,
         use_container_width=True,
         hide_index=True
     )
@@ -1268,26 +1206,24 @@ with tab3:
     )
 
 
-    chart_data = cashflow_df[
+    chart_df = cashflow_df[
         ["Thời điểm", "Dòng tiền"]
     ].copy()
 
-
-    chart_data = chart_data.set_index(
+    chart_df = chart_df.set_index(
         "Thời điểm"
     )
 
-
     st.bar_chart(
-        chart_data
+        chart_df
     )
 
 
-# =========================================================
-# TAB 4
-# =========================================================
+# ============================================================
+# TAB 4 - SO SÁNH
+# ============================================================
 
-with tab4:
+with tab_compare:
 
     st.markdown(
         "## 📈 So sánh thông minh"
@@ -1311,37 +1247,40 @@ with tab4:
 
     for name, months in comparison_terms.items():
 
-        finish = add_months(
+        finish_date = add_months(
             start_date,
             months
         )
 
-        days = (
-            finish - start_date
+        comparison_days = (
+            finish_date - start_date
         ).days
 
-        interest_value = calculate_interest(
-            principal,
-            fixed_rate,
-            days
+        comparison_interest = (
+            calculate_interest(
+                principal,
+                fixed_rate,
+                comparison_days
+            )
         )
 
-        comparison_rows.append({
+        comparison_rows.append(
+            {
+                "Kỳ hạn": name,
 
-            "Kỳ hạn": name,
+                "Số ngày":
+                    comparison_days,
 
-            "Số ngày": days,
+                "Lãi suất":
+                    fixed_rate,
 
-            "Lãi suất":
-                fixed_rate,
+                "Tiền lãi":
+                    comparison_interest,
 
-            "Tiền lãi":
-                interest_value,
-
-            "Tổng nhận":
-                principal + interest_value
-
-        })
+                "Tổng nhận":
+                    principal + comparison_interest
+            }
+        )
 
 
     comparison_df = pd.DataFrame(
@@ -1349,29 +1288,31 @@ with tab4:
     )
 
 
-    show_comparison = comparison_df.copy()
+    display_comparison = comparison_df.copy()
 
 
-    show_comparison["Lãi suất"] = (
-        show_comparison["Lãi suất"]
-        .map(lambda x: f"{x:.2f}%")
+    display_comparison["Lãi suất"] = (
+        display_comparison["Lãi suất"]
+        .apply(
+            lambda x: f"{x:.2f}%"
+        )
     )
 
 
-    show_comparison["Tiền lãi"] = (
-        show_comparison["Tiền lãi"]
+    display_comparison["Tiền lãi"] = (
+        display_comparison["Tiền lãi"]
         .apply(format_money)
     )
 
 
-    show_comparison["Tổng nhận"] = (
-        show_comparison["Tổng nhận"]
+    display_comparison["Tổng nhận"] = (
+        display_comparison["Tổng nhận"]
         .apply(format_money)
     )
 
 
     st.dataframe(
-        show_comparison,
+        display_comparison,
         use_container_width=True,
         hide_index=True
     )
@@ -1382,26 +1323,24 @@ with tab4:
     ].idxmax()
 
 
-    best = comparison_df.loc[
+    best_term = comparison_df.loc[
         best_index
     ]
 
 
     st.success(
-        f"🏆 Với số tiền "
-        f"{format_money(principal)}, "
-        f"kỳ hạn **{best['Kỳ hạn']}** "
-        f"cho tiền lãi cao nhất là "
-        f"**{format_money(best['Tiền lãi'])}**."
+        f"🏆 Kỳ hạn có tiền lãi cao nhất: "
+        f"**{best_term['Kỳ hạn']}** — "
+        f"{format_money(best_term['Tiền lãi'])}"
     )
 
 
     st.markdown(
-        "### 📊 Tiền lãi theo kỳ hạn"
+        "### 📊 Biểu đồ so sánh tiền lãi"
     )
 
 
-    chart = comparison_df[
+    comparison_chart = comparison_df[
         ["Kỳ hạn", "Tiền lãi"]
     ].set_index(
         "Kỳ hạn"
@@ -1409,66 +1348,61 @@ with tab4:
 
 
     st.bar_chart(
-        chart
+        comparison_chart
     )
 
 
-# =========================================================
+# ============================================================
 # KIẾN THỨC NGHIỆP VỤ
-# =========================================================
+# ============================================================
 
 st.markdown("---")
 
 
 with st.expander(
-    "📚 KIẾN THỨC NGHIỆP VỤ TIỀN GỬI"
+    "📚 Kiến thức nghiệp vụ tiền gửi"
 ):
 
     st.markdown(
         """
-        **1. Tiền gửi có kỳ hạn**
+        ### 1. Tiền gửi có kỳ hạn
 
         Khách hàng gửi tiền trong một khoảng thời gian
         xác định và được hưởng lãi suất tương ứng
         với kỳ hạn.
 
-        **2. Rút trước hạn**
+        ### 2. Rút trước hạn
 
-        Khi khách hàng rút tiền trước ngày đáo hạn,
-        khoản tiền được mô phỏng theo lãi suất
-        không kỳ hạn.
+        Nếu khách hàng rút tiền trước ngày đáo hạn,
+        mô hình áp dụng lãi suất không kỳ hạn.
 
-        **3. Nhận lãi hàng tháng**
-
-        Tiền lãi được tính theo số ngày thực tế
-        của từng khoảng thời gian.
-
-        **4. Nhận lãi cuối kỳ**
+        ### 3. Nhận lãi cuối kỳ
 
         Khách hàng nhận tiền gốc và tiền lãi
-        khi kết thúc khoản tiền gửi.
+        khi khoản tiền gửi đến hạn.
 
-        **5. Nhận lãi trước**
+        ### 4. Nhận lãi hàng tháng
 
-        Tiền lãi được tính trước dựa trên
-        số tiền gửi, lãi suất và thời gian gửi.
+        Tiền lãi được tính và phân bổ theo
+        từng khoảng thời gian trong kỳ gửi.
 
-        **6. Tái tục**
+        ### 5. Tự động tái tục
 
-        Khi đến ngày đáo hạn, khách hàng có thể
-        tiếp tục gửi khoản tiền sang kỳ hạn mới.
+        Khi khoản tiền gửi đến hạn,
+        khách hàng có thể tiếp tục gửi tiền
+        sang một kỳ hạn mới.
 
-        **7. Cơ sở tính lãi**
+        ### 6. Cơ sở tính lãi
 
-        Mô hình sử dụng cơ sở
+        Hệ thống sử dụng cơ sở tính lãi
         **365 ngày/năm**.
         """
     )
 
 
-# =========================================================
+# ============================================================
 # FOOTER
-# =========================================================
+# ============================================================
 
 st.markdown("---")
 
