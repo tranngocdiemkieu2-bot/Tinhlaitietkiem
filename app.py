@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 # =========================================================
 
 st.set_page_config(
-    page_title="SmartSave 360",
+    page_title="SmartSave 365",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="expanded"
